@@ -23,7 +23,7 @@ PPROF:=go tool pprof -png -output pprof.png http://localhost:6060/debug/pprof/pr
 PPROF_WEB:=go tool pprof -http=0.0.0.0:1080 webapp/go  http://localhost:6060/debug/pprof/profile
 
 PROJECT_ROOT:=/home/isucon/
-BUILD_DIR:=/home/isucon/webapp/golang
+BUILD_DIR:=/home/isucon/private_isu/webapp/golang
 
 CA:=-o /dev/null -s -w "%{http_code}\n"
 
@@ -33,8 +33,7 @@ restart-go:
 
 .PHONY: dev
 dev: 
-	cd $(BUILD_DIR); \
-	bash setup.sh; \
+	bash $(BUILD_DIR)/setup.sh; \
 	sudo systemctl restart isu-go.service
 
 .PHONY: bench-dev
