@@ -69,6 +69,8 @@ before:
 	@if [ -f $(MYSQL_LOG) ]; then \
 		sudo mv -f $(MYSQL_LOG) /var/log/mysql/$(when)/ ; \
 	fi
+
+	bash config_setup.sh
 	sudo systemctl restart nginx mysql
 
 .PHONY: slow
