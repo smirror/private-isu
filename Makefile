@@ -122,9 +122,14 @@ slow-on:
 slow-off:
 	$(MYSQL) -e "set global slow_query_log = OFF;"
 
+.PHONY: ab-test
+ab-test:
+	ab -c 1 -n 10 http://localhost/ | $(SLACKCAT_ALP)
+
 .PHONY: setup
 setup:
-	sudo apt install -y git unzip htop bash-completion
+	sudo apt update
+	sudo apt install -y git unzip htop bash-completion apache2-utils
 	
 	# go
 	wget https://golang.org/dl/go1.19.4.linux-amd64.tar.gz
