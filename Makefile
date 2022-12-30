@@ -6,13 +6,12 @@ NGX_LOG:=/var/log/nginx/access.log
 
 MYSQL_HOST="127.0.0.1"
 MYSQL_PORT=3306
-MYSQL_USER=isucon
-MYSQL_DBNAME=isucondition
-MYSQL_PASS=isucon
-MYSQL_LOG:=/var/log/mysql/slow.log
+MYSQL_USER=isuconp
+MYSQL_DBNAME=isuconp
+MYSQL_PASS=isuconp
+MYSQL_LOG:=/var/log/mysql/mysql-slow.log
 
 MYSQL=mysql -h$(MYSQL_HOST) -P$(MYSQL_PORT) -u$(MYSQL_USER) -p$(MYSQL_PASS) $(MYSQL_DBNAME)
-SLOW_LOG=/tmp/slow-query.log
 
 SLACKCAT:=slackcat --tee --channel general
 SLACKCAT_MYSQL:=slackcat --tee --channel mysql-slow-query
@@ -57,27 +56,24 @@ commit:
 	git add .; \
 	git commit --allow-empty -m "bench"
 
-.PHONY: before
-before:
-	now_time=$(shell date "+%s")
-
-	# sudo mv $(NGX_LOG) /var/log/nginx/$(now_time)
-
-	# sudo mv $(MYSQL_LOG) /var/log/nginx/$(now_time)
-
+.PHONY: config-set
+config-set:
 	bash config_setup.sh
 	sudo systemctl restart nginx mysql
 
-.PHONY: slow
-slow:
-	sudo pt-query-digest $(MYSQL_LOG) | $(SLACKCAT_MYSQL)
+.PHONY: before
+before:
+	now_time=$(shell date "+%Y%m%d-%H%M%S")
+
+	sudo mv $(NGX_LOG) $(NGX_LOG).$(now_time)
+	sudo mv $(MYSQL_LOG) $(MYSQL_LOG).$(now_time)
+	sudo systemctl restart nginx mysql
 
 # mysqldumpslowを使ってslow wuery logを出力
 # オプションは合計時間ソート
-.PHONY: slow-show
-slow-show:
-	sudo mysqldumpslow -s t $(SLOW_LOG) | head -n 20 | $(SLACKCAT_MYSQL)
-
+.PHONY: slow
+slow:
+	sudo mysqldumpslow -s t $(MYSQL_LOG) | head -n 20 | $(SLACKCAT_MYSQL)
 
 # alp
 
@@ -87,15 +83,7 @@ OUTFORMAT=count,method,uri,min,max,sum,avg,p99
 
 .PHONY: alp-cat
 alp-cat:
-	sudo alp ltsv --file=/var/log/nginx/access.log --sort $(ALPSORT) --reverse -o $(OUTFORMAT) -m $(ALPM) -q | $(SLACKCAT_ALP)
-
-.PHONY: alpsave
-alpsave:
-	sudo alp ltsv --file=/var/log/nginx/access.log --pos /tmp/alp.pos --dump /tmp/alp.dump --sort $(ALPSORT) --reverse -o $(OUTFORMAT) -m $(ALPM) -q
-
-.PHONY: alpload
-alpload:
-	sudo alp ltsv --load /tmp/alp.dump --sort $(ALPSORT) --reverse -o $(OUTFORMAT) -q
+	sudo alp json --file=/var/log/nginx/access.log --sort $(ALPSORT) --reverse -o $(OUTFORMAT) -m $(ALPM) -q | $(SLACKCAT_ALP)
 
 .PHONY: pprof
 pprof:
@@ -105,18 +93,6 @@ pprof:
 .PHONY: pprof-web
 pprof-web:
 	go tool pprof -http=0.0.0.0:1080 $(BUILD_DIR)  http://localhost:6060/debug/pprof/profile
-
-# slow-wuery-logを取る設定にする
-# DBを再起動すると設定はリセットされる
-.PHONY: slow-on
-slow-on:
-	sudo rm $(SLOW_LOG)
-	sudo systemctl restart mysql
-	$(MYSQL) -e "set global slow_query_log_file = '$(SLOW_LOG)'; set global long_query_time = 0.001; set global slow_query_log = ON;"
-
-.PHONY: slow-off
-slow-off:
-	$(MYSQL) -e "set global slow_query_log = OFF;"
 
 .PHONY: ab-test
 ab-test:
