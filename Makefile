@@ -83,12 +83,12 @@ slow:
 # alp
 
 ALPSORT=sum
-ALPM="/api/isu/.+/icon,/api/isu/.+/graph,/api/isu/.+/condition,/api/isu/[-a-z0-9]+,/api/condition/[-a-z0-9]+,/api/catalog/.+,/api/condition\?,/isu/........-....-.+"
-OUTFORMAT=count,method,uri,min,max,sum,avg,p99
+ALPM="/posts/[0-9]+,/@\w+,/image/\d+"
+OUTFORMAT=count,method,uri,min,avg,max,p99,sum
 
 .PHONY: alp-cat
 alp-cat:
-	sudo alp json --file=/var/log/nginx/access.log --sort $(ALPSORT) --reverse -o $(OUTFORMAT) -m $(ALPM) -q | $(SLACKCAT_ALP)
+	sudo alp json --file=/var/log/nginx/access.log --sort $(ALPSORT) --reverse -m $(ALPM) -o $(OUTFORMAT) | $(SLACKCAT_ALP)
 
 .PHONY: pprof
 pprof:
