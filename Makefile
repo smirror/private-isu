@@ -32,7 +32,7 @@ restart-go:
 
 .PHONY: dev
 dev: 
-	bash $(BUILD_DIR)/setup.sh; \
+	bash $(BUILD_DIR)/setup.sh
 	sudo systemctl restart isu-go.service
 
 .PHONY: bench-dev
