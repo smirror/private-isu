@@ -62,6 +62,7 @@ config-set:
 	sudo nginx -t
 
 	sudo cp webapp/etc/my.cnf /etc/mysql/my.cnf
+
 	sudo cp webapp/etc/sysctl.conf /etc/sysctl.conf
 	sudo sysctl -p
 
@@ -118,14 +119,7 @@ setup:
 	unzip alp_linux_amd64.zip
 	sudo install ./alp /usr/local/bin/
 	rm -rf  alp*	
-	
-	# pt-query-digest
-	wget https://github.com/percona/percona-toolkit/archive/refs/tags/3.5.0.tar.gz
-	tar zxvf 3.5.0.tar.gz 
-	sudo mv ./percona-toolkit-3.5.0/bin/pt-query-digest /usr/local/bin/pt-query-digest
-	rm 3.5.0.tar.gz
-	rm -rf percona-toolkit-3.5.0
-	
+		
 	# for pprof
 	sudo apt install graphviz
 
