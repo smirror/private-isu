@@ -59,15 +59,11 @@ commit:
 
 .PHONY: before
 before:
-	$(eval when := $(shell date "+%s"))
+	now_time=$(shell date "+%s")
 
-	ifeq ("$(wildcard $(NGX_LOG))", "")
-		sudo mv $(NGX_LOG) /var/log/nginx/$(when) ; \
- 	endif
+	# sudo mv $(NGX_LOG) /var/log/nginx/$(now_time)
 
-	ifeq ("$(wildcard $(MYSQL_LOG))", "")
-		sudo mv $(MYSQL_LOG) /var/log/mysql/$(when) ; \
- 	endif
+	# sudo mv $(MYSQL_LOG) /var/log/nginx/$(now_time)
 
 	bash config_setup.sh
 	sudo systemctl restart nginx mysql
