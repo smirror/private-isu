@@ -114,6 +114,9 @@ setup:
 	sudo tar -C /usr/local/ -xzf go1.19.4.linux-amd64.tar.gz
 	rm go1.19.4.linux-amd64.tar.gz*
 	
+	# netdata
+	wget -O /tmp/netdata-kickstart.sh https://my-netdata.io/kickstart.sh && sh /tmp/netdata-kickstart.sh
+
 	# alp
 	wget https://github.com/tkuchiki/alp/releases/download/v1.0.12/alp_linux_amd64.zip
 	unzip alp_linux_amd64.zip
