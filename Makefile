@@ -2,7 +2,7 @@ export GO111MODULE=on
 
 SQL_CMD:=mysql -h$(DB_HOST) -P$(DB_PORT) -u$(DB_USER) -p$(DB_PASS) $(DB_NAME)
 
-NGX_LOG:=/var/log/nginx/app.access.log
+NGX_LOG:=/var/log/nginx/access.log
 
 MYSQL_HOST="127.0.0.1"
 MYSQL_PORT=3306
@@ -60,14 +60,14 @@ commit:
 .PHONY: before
 before:
 	$(eval when := $(shell date "+%s"))
-	sudo mkdir /var/log/mysql/$(when)
-	sudo mkdir /var/log/nginx/$(when)
-	@if [ -f $(NGX_LOG) ]; then \
-		sudo mv -f $(NGX_LOG) /var/log/nginx/$(when)/ ; \
-	fi
-	@if [ -f $(MYSQL_LOG) ]; then \
-		sudo mv -f $(MYSQL_LOG) /var/log/mysql/$(when)/ ; \
-	fi
+
+	ifeq ("$(wildcard $(NGX_LOG))", "")
+		sudo mv $(NGX_LOG) /var/log/nginx/$(when) ; \
+ 	endif
+
+	ifeq ("$(wildcard $(MYSQL_LOG))", "")
+		sudo mv $(MYSQL_LOG) /var/log/mysql/$(when) ; \
+ 	endif
 
 	bash config_setup.sh
 	sudo systemctl restart nginx mysql
