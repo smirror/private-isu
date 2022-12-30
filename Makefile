@@ -58,15 +58,19 @@ commit:
 
 .PHONY: config-set
 config-set:
-	bash config_setup.sh
+	sudo cp webapp/etc/nginx/nginx.conf /etc/nginx/nginx.conf
+	sudo nginx -t
+
+	sudo cp webapp/etc/my.cnf /etc/mysql/my.cnf
+	sudo cp webapp/etc/sysctl.conf /etc/sysctl.conf
+	sudo sysctl -p
+
 	sudo systemctl restart nginx mysql
 
 .PHONY: before
 before:
-	now_time=$(shell date "+%Y%m%d-%H%M%S")
-
-	sudo mv $(NGX_LOG) $(NGX_LOG).$(now_time)
-	sudo mv $(MYSQL_LOG) $(MYSQL_LOG).$(now_time)
+	sudo mv $(NGX_LOG) $(NGX_LOG).`date "+%Y%m%d-%H%M%S"`
+	sudo mv $(MYSQL_LOG) $(MYSQL_LOG).`date "+%Y%m%d-%H%M%S"`
 	sudo systemctl restart nginx mysql
 
 # mysqldumpslowを使ってslow wuery logを出力
