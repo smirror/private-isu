@@ -59,6 +59,7 @@ commit:
 .PHONY: config-set
 config-set:
 	sudo cp webapp/etc/nginx/nginx.conf /etc/nginx/nginx.conf
+	sudo cp webapp/etc/nginx/sites-available/isucon.conf /etc/nginx/sites-available/isucon.conf
 	sudo nginx -t
 
 	sudo cp webapp/etc/my.cnf /etc/mysql/my.cnf
