@@ -822,6 +822,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to DB: %s.", err.Error())
 	}
+	db.SetMaxOpenConns(8)
+	db.SetMaxIdleConns(8)
 	defer db.Close()
 
 	r := chi.NewRouter()
