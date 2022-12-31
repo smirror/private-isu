@@ -27,6 +27,7 @@ import (
 var (
 	db    *sqlx.DB
 	store *gsm.MemcacheStore
+	mc *memcache.Client
 )
 
 const (
@@ -195,6 +196,19 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 			if err != nil {
 				return nil, err
 			}
+
+			// JSONにエンコード
+			j, err := json.Marshal(user)
+			if err != nil {
+				return nil, err
+			}
+
+			// memcachedに格納
+			mc.Set(&memcache.Item{
+				Key: fmt.Sprintf("user_id:%d", id),
+				Value: j,
+				Expiration: 3600,
+			})
 		}
 
 		p.Comments = comments
@@ -823,6 +837,9 @@ func main() {
 		log.Fatalf("Failed to connect to DB: %s.", err.Error())
 	}
 	defer db.Close()
+
+	// memchedへの接続
+	mc := memcache.New("127.0.0.1:11211")
 
 	r := chi.NewRouter()
 

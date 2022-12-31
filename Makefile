@@ -80,6 +80,10 @@ before:
 slow:
 	sudo mysqldumpslow -s t $(MYSQL_LOG) | head -n 20 | $(SLACKCAT_MYSQL)
 
+.PHONY: pt-query
+pt-query:
+	sudo pt-query-digest $(MYSQL_LOG) | head -n 169 | $(SLACKCAT_MYSQL)
+
 # alp
 
 ALPSORT=sum
@@ -106,7 +110,7 @@ ab-test:
 .PHONY: setup
 setup:
 	sudo apt update
-	sudo apt install -y git unzip htop bash-completion apache2-utils
+	sudo apt install -y git unzip htop bash-completion apache2-utils percona-toolkit
 	
 	# go
 	wget https://golang.org/dl/go1.19.4.linux-amd64.tar.gz
